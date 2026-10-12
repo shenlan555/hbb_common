@@ -114,8 +114,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rust.fanoyi.com"];
+pub const RS_PUB_KEY: &str = "tIPaAJXtvIHuBfh4w9i42OQLanXDyspGOhAcoEkSi+E=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -2140,7 +2140,37 @@ pub struct LocalConfig {
 
 impl LocalConfig {
     fn load() -> LocalConfig {
-        Config::load_::<LocalConfig>("_local")
+        let mut config = Config::load_::<LocalConfig>("_local");
+        let mut store = false;
+        if !config.options.contains_key("enable-check-update") {
+            config
+                .options
+                .insert("enable-check-update".to_string(), "N".to_string());
+            store = true;
+        }
+        if !config.options.contains_key("enable-udp-punch") {
+            config
+                .options
+                .insert("enable-udp-punch".to_string(), "Y".to_string());
+            store = true;
+        }
+        if !config.options.contains_key("enable-ipv6-punch") {
+            config
+                .options
+                .insert("enable-ipv6-punch".to_string(), "Y".to_string());
+            store = true;
+        }
+        if !config.options.contains_key("allow-remote-config-modification") {
+            config.options.insert(
+                "allow-remote-config-modification".to_string(),
+                "Y".to_string(),
+            );
+            store = true;
+        }
+        if store {
+            config.store();
+        }
+        config
     }
 
     fn store(&self) {
